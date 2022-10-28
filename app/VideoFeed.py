@@ -9,7 +9,7 @@ import math
 from app import LocationsMapping, CarsState
 import logging.config
 
-DETECTION_THRESHOLD = 0.6
+DETECTION_THRESHOLD = 0.8
 DETECTION_SIZE_THRESHOLD = 30
 DETECTION_CLASSES = ('car', 'truck')
 DATE_FORMATTED = datetime.now().strftime("%m-%d-%Y")
@@ -80,7 +80,7 @@ class VideoFeed:
     def run(self):
         self.logger.info("starting to read video feed")
         while True:
-            #time.sleep(3)
+            time.sleep(3)
             self.frame = self.cap.read()[1]
             if self.frame is None:
                 self.logger.error("Video-stream is None!")
@@ -94,8 +94,8 @@ class VideoFeed:
             results = self.model(gray_frame)
             self.__process_detections(results)
 
-            cv2.imshow('res', self.frame)
-            cv2.waitKey(100)
+            # cv2.imshow('res', self.frame)
+            # cv2.waitKey(100)
 
         self.logger.info("Destroying video feed.")
         self.cap.release()
