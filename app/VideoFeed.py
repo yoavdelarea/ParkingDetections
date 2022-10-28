@@ -9,7 +9,7 @@ import math
 from app import LocationsMapping, CarsState
 import logging.config
 
-DETECTION_THRESHOLD = 0.5
+DETECTION_THRESHOLD = 0.6
 DETECTION_SIZE_THRESHOLD = 30
 DETECTION_CLASSES = ('car', 'truck')
 DATE_FORMATTED = datetime.now().strftime("%m-%d-%Y")
@@ -26,7 +26,7 @@ logging.config.fileConfig(log_file_path, disable_existing_loggers=False)
 class VideoFeed:
 
     def __init__(self):
-        self.cap = cv2.VideoCapture(2)
+        self.cap = cv2.VideoCapture('rtsp://delarea:delarea6@10.100.102.55:554/stream1')
         self.cars_count = CarsState.CarState()
         self.cars_locations = LocationsMapping.CarsLocations()
         self.frame = None
@@ -70,7 +70,7 @@ class VideoFeed:
 
     def __save_snapshot(self):
         self.logger.info(f"Amount of cars: {self.cars_count.count}")
-        dir_name = f"{PATH}/changes/{DATE_FORMATTED}"
+        dir_name = f"{PATH}/app/changes/{DATE_FORMATTED}"
         if not os.path.isdir(dir_name):
             os.mkdir(dir_name)
         filename = f"{dir_name}/{HOUR_FORMATTED}-{self.cars_count.count}-cars.jpeg"
@@ -80,11 +80,12 @@ class VideoFeed:
     def run(self):
         self.logger.info("starting to read video feed")
         while True:
-            time.sleep(5)
+            #time.sleep(3)
             self.frame = self.cap.read()[1]
             if self.frame is None:
                 self.logger.error("Video-stream is None!")
-                break
+                time.sleep(5)
+                continue
 
             gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
             # cv2.imshow('gray', gray_frame)

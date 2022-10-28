@@ -39,9 +39,9 @@ class TelegramBot:
         hour = datetime.now().strftime("%H:%M:%S")
 
         logger.info(f"{message.chat.first_name} requested to see status ")
-        dir_name = f"changes/{date}"
+        dir_name = f"app/changes/{date}"
         list_of_files = glob.glob(
-            f'/home/eyal/PycharmProjects/parking/{dir_name}/*')  # * means all if need specific format then *.csv
+            f'/home/eyal/Pycharmprojects/ParkingDetections/{dir_name}/*')  # * means all if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
         await bot.send_photo(message.chat.id, photo=open(latest_file, "rb"))
         await bot.send_message(message.chat.id,
