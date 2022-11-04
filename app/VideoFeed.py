@@ -9,11 +9,11 @@ import math
 from app import LocationsMapping, CarsState
 import logging.config
 
-DETECTION_THRESHOLD = 0.8
+DETECTION_THRESHOLD = 0.75
 DETECTION_SIZE_THRESHOLD = 30
 DETECTION_CLASSES = ('car', 'truck')
-DATE_FORMATTED = datetime.now().strftime("%m-%d-%Y")
-HOUR_FORMATTED = datetime.now().strftime("%H:%M:%S")
+#DATE_FORMATTED = datetime.now().strftime("%m-%d-%Y")
+#HOUR_FORMATTED = datetime.now().strftime("%H:%M:%S")
 PATH = os.getcwd()
 MODEL = "yolov5"
 MODEL_SIZE = "x"
@@ -43,7 +43,7 @@ class VideoFeed:
         count = 0
         for i in df.index:
             label = df['name'][i]
-            if label in DETECTION_CLASSES:
+            if label in DETECTION_CLASSES or True:
                 x1, y1 = int(df['xmin'][i]), int(df['ymin'][i])
                 x2, y2 = int(df['xmax'][i]), int(df['ymax'][i])
                 # only add if the diff is really different
@@ -60,7 +60,8 @@ class VideoFeed:
                 else:
                     # mark successful detections
                     self.cars_locations.add((x1, x2, y1, y2))
-                    count += 1
+                    if label in DETECTION_CLASSES:
+                      count += 1
                     cv2.rectangle(self.frame, (x1, y1), (x2, y2), (255, 255, 0), 2)
                     cv2.putText(self.frame, str(confidence), (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255),
                                 1)
@@ -69,6 +70,8 @@ class VideoFeed:
             self.__save_snapshot()
 
     def __save_snapshot(self):
+        DATE_FORMATTED = datetime.now().strftime("%m-%d-%Y")
+        HOUR_FORMATTED = datetime.now().strftime("%H:%M:%S")
         self.logger.info(f"Amount of cars: {self.cars_count.count}")
         dir_name = f"{PATH}/app/changes/{DATE_FORMATTED}"
         if not os.path.isdir(dir_name):
@@ -80,11 +83,16 @@ class VideoFeed:
     def run(self):
         self.logger.info("starting to read video feed")
         while True:
-            time.sleep(3)
+            #time.sleep(3)
             self.frame = self.cap.read()[1]
             if self.frame is None:
                 self.logger.error("Video-stream is None!")
                 time.sleep(5)
+                self.cap.release()
+                # cv2.destroyAllWindows()
+                self.logger.info("Trying to init cap again")
+                self.cap = cv2.VideoCapture('rtsp://delarea:delarea6@10.100.102.55:554/stream1')
+                self.logger.info("done")
                 continue
 
             gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)

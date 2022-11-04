@@ -37,7 +37,7 @@ class TelegramBot:
     async def send_welcome(message):
         date = datetime.now().strftime("%m-%d-%Y")
         hour = datetime.now().strftime("%H:%M:%S")
-
+        #TODO handle list of files is empty cuz of date change 
         logger.info(f"{message.chat.first_name} requested to see status ")
         dir_name = f"app/changes/{date}"
         list_of_files = glob.glob(
