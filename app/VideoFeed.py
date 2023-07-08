@@ -26,7 +26,7 @@ logging.config.fileConfig(log_file_path, disable_existing_loggers=False)
 class VideoFeed:
 
     def __init__(self):
-        self.cap = cv2.VideoCapture('rtsp://delarea:delarea6@10.100.102.55:554/stream1')
+        self.cap = cv2.VideoCapture(0)
         self.cars_count = CarsState.CarState()
         self.cars_locations = LocationsMapping.CarsLocations()
         self.frame = None
@@ -96,14 +96,14 @@ class VideoFeed:
                 continue
 
             gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-            # cv2.imshow('gray', gray_frame)
+            cv2.imshow('gray', gray_frame)
 
             # Detect cars
             results = self.model(gray_frame)
             self.__process_detections(results)
 
-            # cv2.imshow('res', self.frame)
-            # cv2.waitKey(100)
+            cv2.imshow('res', self.frame)
+            cv2.waitKey(100)
 
         self.logger.info("Destroying video feed.")
         self.cap.release()
